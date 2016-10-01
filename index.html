@@ -8,19 +8,21 @@
 </head>
 <body>
 
-<div class="container">
-    <div class="row">
-        <div id="app">
-            Loading...
-        </div>
-    </div>
+<div id="app">
+
 </div>
 
 
-    <script>
-        new WeatherWidget({
-            element: document.querySelector('#app')
-        })
-    </script>
+<script>
+    new WeatherWidget({
+        element: document.querySelector('#app'),
+        apiId: '6dffb76ddbcf7fb1bc31c24d6a23651e',
+        styles: {
+            width: 35, // in percents,
+            margin: 'auto',
+        },
+        type: 'metric' // metric or imperial
+    })
+</script>
 </body>
 </html>

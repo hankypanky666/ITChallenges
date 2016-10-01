@@ -1,12 +1,15 @@
 // a957911186d6957a2a33a1ece83a6056
-const apiId = '6dffb76ddbcf7fb1bc31c24d6a23651e';
 const url = 'http://api.openweathermap.org/data/2.5/weather?';
 const weatherUrlIcon = 'http://openweathermap.org/img/w/';
 
+const celsius = '&deg; C';
+const fahrenheit = '&deg; F';
+
 const template = require('../templates/weather-widget.hbs');
+const reloader = require('../templates/reload.hbs');
 
 //add styles
-require('../node_modules/bootstrap/dist/css/bootstrap.min.css');
+require('../static/loader.css');
 require('../static/style.css');
 
 let HTTPService = require('./HTTPService');
@@ -15,6 +18,17 @@ let GeolocationWidget = require('./GeolocationWidget');
 class WeatherWidget {
     constructor(options) {
         this._el = options.element;
+        this._appId = options.apiId;
+        this._styles = options.styles;
+        this._weatherType = options.type || 'metric';
+
+        this._setWeatherType(this._weatherType);
+
+        this._el.style.width = this._styles.width + '%' || '100%';
+        this._el.style.margin = this._styles.margin || 'auto';
+        this._el.className = this._styles.cssClass || '';
+
+        this._el.innerHTML = reloader();
 
         if (!navigator.geolocation) {
             this._el.innerHTML = '<p>Geolocation is not supported by your browser</p>';
@@ -24,6 +38,12 @@ class WeatherWidget {
 
         this.http = new HTTPService();
 
+        document.addEventListener("DOMContentLoaded", this._ready.bind(this));
+
+        this._el.addEventListener('click', this._refreshData.bind(this));
+    }
+
+    _ready() {
         this.position.getUserPosition()
             .then((position) => this._loadData(position))
             .catch(function (error) {
@@ -33,34 +53,55 @@ class WeatherWidget {
 
     // loading data from Weather
     _loadData(position) {
-        console.log(position);
-        this.http.httpGet(url + 'lat=' + position.coords.latitude.toFixed(2) + '&lon=' + position.coords.longitude.toFixed(2) + '&units=metric' + '&appid=' + apiId)
+        let lastUpdate = this._createDateTime(position.timestamp);
+
+        this.http.httpGet(url + 'lat=' + position.coords.latitude.toFixed(2) + '&lon=' + position.coords.longitude.toFixed(2) + '&units=' + this._getWeatherType() + '&appid=' + this._appId)
             .then(
                 response => {
-                    this._render(response);
+                    this._render(response, lastUpdate);
                 },
                 error => console.log(`Rejected: ${error}`)
             );
     }
 
     // render template
-    _render(data) {
+    _render(data, lastUpdate) {
         const dataWeather = JSON.parse(data);
-        dataWeather.img = weatherUrlIcon + dataWeather.weather[0].icon;
-        dataWeather.wind.desc = this._toTextualDescription(dataWeather.wind.deg);
-        dataWeather.rain.desc = !dataWeather.rain["3h"] ? 0 : dataWeather.rain["3h"];
-        dataWeather.weather.desc = dataWeather.weather[0].main;
-        dataWeather.sunrise = this._createDateTime(dataWeather.sys.sunrise);
-        dataWeather.sunset = this._createDateTime(dataWeather.sys.sunset);
+        if (dataWeather.coord) {
+            dataWeather.cityName = dataWeather.name;
+            dataWeather.countryId = dataWeather.sys.country;
+            dataWeather.img = weatherUrlIcon + dataWeather.weather[0].icon;
+            dataWeather.temperature = dataWeather.main.temp.toFixed(1);
+            dataWeather.weatherDescription = dataWeather.weather[0].description;
+            dataWeather.windSpeed = dataWeather.wind.speed.toFixed(1);
+            dataWeather.windDeg = dataWeather.wind.deg.toFixed();
+            dataWeather.windDescription = this._toTextualDescription(dataWeather.wind.deg);
+            dataWeather.cloudsPercent = dataWeather.clouds.all;
+            dataWeather.pressure = dataWeather.main.pressure;
+            dataWeather.humidity = dataWeather.main.humidity;
+            dataWeather.rainDescription = !dataWeather.rain["3h"] ? 0 : dataWeather.rain["3h"];
+            dataWeather.sign = this._getSign(this._getWeatherType());
 
-        this._el.innerHTML = template({
-            dataWeather: dataWeather
-        });
+            dataWeather.cel = this._getWeatherType() === 'metric' ? 'metric' : null;
+            dataWeather.far = this._getWeatherType() === 'imperial' ? 'imperial' : null;
+
+            dataWeather.sunrise = this._createDateTime(dataWeather.sys.sunrise);
+            dataWeather.sunset = this._createDateTime(dataWeather.sys.sunset);
+
+            // generate handlebars template
+            this._el.innerHTML = template({
+                dataWeather: dataWeather,
+                lastUpdate: lastUpdate
+            });
+        } else {
+            this._el.innerHTML = dataWeather.message;
+        }
+
     }
 
     _createDateTime(date) {
         let dateTime = new Date(date);
-        return dateTime.getHours() + ':' + dateTime.getMinutes();
+        return dateTime.getHours() + ':' + (dateTime.getMinutes() < 10 ? '0' : '') + dateTime.getMinutes();
     }
 
     _toTextualDescription(degree) {
@@ -76,6 +117,34 @@ class WeatherWidget {
         }
         return 'Northerly';
     }
+
+    _refreshData(e) {
+        if (e.target.hasAttribute('data-refresh')) {
+            // refresh data
+            this._el.innerHTML = reloader();
+            this._ready();
+        }
+        if (e.target.getAttribute('name') === 'weatherType') {
+            this._setWeatherType(e.target.getAttribute('data-type'));
+            this._el.innerHTML = reloader();
+            this._ready();
+        }
+    }
+
+    _setWeatherType(type) {
+        if (type !== sessionStorage.getItem('sign')){
+            sessionStorage.setItem('sign', type);
+        }
+    }
+
+    _getWeatherType() {
+        return sessionStorage.getItem('sign');
+    }
+
+    _getSign(type) {
+        return type === 'metric' ? celsius : fahrenheit;
+    }
+
 }
 
 module.exports = WeatherWidget;
