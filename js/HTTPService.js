@@ -29,5 +29,6 @@ class HTTPService {
         });
 
     }
-
 }
+
+module.exports = HTTPService;

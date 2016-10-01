@@ -1,0 +1,38 @@
+<div id="weather-widget" class="weather-widget">
+    <h2 id="weather-widget-city-name" class="weather-widget__city-name">{{dataWeather.name}}, {{dataWeather.sys.country}}</h2>
+    <h3 id="weather-widget-temperature" class="weather-widget__temperature">
+        <img src="{{dataWeather.img}}.png">
+        {{dataWeather.main.temp}}
+    </h3>
+    <p id="weather-widget-main" class="weather-widget__main">{{dataWeather.weather.desc}}</p>
+    <table class="weather-widget__items table table-striped table-bordered table-condensed">
+        <tbody><tr>
+            <td>Wind</td>
+            <td id="weather-widget-wind">{{dataWeather.wind.speed}} m/s <br> {{dataWeather.wind.desc}} ({{dataWeather.wind.deg}})</td>
+        </tr>
+        <tr>
+            <td>Cloudiness</td>
+            <td id="weather-widget-cloudiness">{{dataWeather.clouds.all}} %</td>
+        </tr>
+        <tr>
+            <td>Pressure</td>
+            <td id="weather-widget-pressure">{{dataWeather.main.pressure}} hpa</td>
+        </tr>
+        <tr>
+            <td>Humidity</td>
+            <td id="weather-widget-humidity">{{dataWeather.main.humidity}} %</td>
+        </tr>
+        <tr id="weather-widget-row-rain">
+            <td>Rain</td>
+            <td id="weather-widget-rain">{{dataWeather.rain.desc}}</td>
+        </tr>
+        <tr>
+            <td>Sunrise</td>
+            <td id="weather-widget-sunrise">{{dataWeather.sunrise}}</td>
+        </tr>
+        <tr>
+            <td>Sunset</td>
+            <td id="weather-widget-sunset">{{dataWeather.sunset}}</td>
+        </tr>
+        </tbody></table>
+</div>

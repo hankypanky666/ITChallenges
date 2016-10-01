@@ -22,3 +22,5 @@ class GeolocationWidget {
     //     this._el.innerHTML = "Unable to retrieve your location";
     // }
 }
+
+module.exports = GeolocationWidget;

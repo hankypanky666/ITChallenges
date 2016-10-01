@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ITChallenges Weather Widget</title>
+
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static/style.css">
+
+    <script src="bundle.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+        <div id="app">
+            Loading...
+        </div>
+    </div>
+</div>
+
+
+    <script>
+        new WeatherWidget({
+            element: document.querySelector('#app')
+        })
+    </script>
+</body>
+</html>

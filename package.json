@@ -1,0 +1,15 @@
+{
+  "name": "itchallenges",
+  "version": "1.0.0",
+  "description": "test for itchallenges",
+  "main": "index.js",
+  "dependencies": {
+    "bootstrap": "^4.0.0-alpha.4",
+    "handlebars": "^4.0.5",
+    "handlebars-loader": "^1.4.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
