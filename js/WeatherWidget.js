@@ -5,6 +5,10 @@ const weatherUrlIcon = 'http://openweathermap.org/img/w/';
 
 const template = require('../templates/weather-widget.hbs');
 
+//add styles
+require('../node_modules/bootstrap/dist/css/bootstrap.min.css');
+require('../static/style.css');
+
 let HTTPService = require('./HTTPService');
 let GeolocationWidget = require('./GeolocationWidget');
 
