@@ -141,12 +141,12 @@ class WeatherWidget {
         if (e.target.hasAttribute('data-refresh')) {
             // refresh data
             this._el.innerHTML = reloader();
-            this._ready();
+            this._ready(e, this._getCity());
         }
         if (e.target.getAttribute('name') === 'weatherType') {
             this._setWeatherType(e.target.getAttribute('data-type'));
             this._el.innerHTML = reloader();
-            this._ready();
+            this._ready(e, this._getCity());
         }
         if (e.target.getAttribute('name') === 'city-submit') {
             let form = document.forms.changeCity;
@@ -156,6 +156,11 @@ class WeatherWidget {
             }
             this._setCity(form.elements.cityName.value);
             this._ready(null, this._getCity());
+        }
+        if (e.target.getAttribute('name') === 'city-refresh') {
+            this._setCity(null);
+            this._el.innerHTML = reloader();
+            this._ready();
         }
     }
 
@@ -174,6 +179,9 @@ class WeatherWidget {
     }
 
     _setCity(city) {
+        if(!city) {
+            sessionStorage.removeItem('city');
+        }
         sessionStorage.setItem('city', city);
     }
 
