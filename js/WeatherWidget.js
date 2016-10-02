@@ -7,6 +7,7 @@ const fahrenheit = '&deg; F';
 
 const template = require('../templates/weather-widget.hbs');
 const reloader = require('../templates/reload.hbs');
+const errortpl = require('../templates/error.hbs');
 
 //add styles
 require('../static/loader.css');
@@ -43,25 +44,41 @@ class WeatherWidget {
         this._el.addEventListener('click', this._refreshData.bind(this));
     }
 
-    _ready() {
-        this.position.getUserPosition()
-            .then((position) => this._loadData(position))
-            .catch(function (error) {
-                // uhoh, something went wrong
-            });
+    _ready(e, city) {
+        if (!city){
+            this.position.getUserPosition()
+                .then((position) => this._loadData(position))
+                .catch(function (error) {
+                    // uhoh, something went wrong
+                });
+        } else {
+            this._loadData(null, city);
+        }
+
     }
 
     // loading data from Weather
-    _loadData(position) {
-        let lastUpdate = this._createDateTime(position.timestamp);
+    _loadData(position, city) {
+        if (!city){
+            let lastUpdate = this._createDateTime(position.timestamp);
 
-        this.http.httpGet(url + 'lat=' + position.coords.latitude.toFixed(2) + '&lon=' + position.coords.longitude.toFixed(2) + '&units=' + this._getWeatherType() + '&appid=' + this._appId)
-            .then(
-                response => {
-                    this._render(response, lastUpdate);
-                },
-                error => console.log(`Rejected: ${error}`)
-            );
+            this.http.httpGet(`${url}lat=${position.coords.latitude.toFixed(2)}&lon=${position.coords.longitude.toFixed(2)}&units=${this._getWeatherType()}&appid=${this._appId}`)
+                .then(
+                    response => {
+                        this._render(response, lastUpdate);
+                    },
+                    error => console.log(`Rejected: ${error}`)
+                );
+        } else {
+            this.http.httpGet(`${url}q=${city}&units=${this._getWeatherType()}&appid=${this._appId}`)
+                .then(
+                    response => {
+                        this._render(response, this._createDateTime(Date.now()));
+                    },
+                    error => console.log(`Rejected: ${error}`)
+                );
+        }
+
     }
 
     // render template
@@ -74,12 +91,12 @@ class WeatherWidget {
             dataWeather.temperature = dataWeather.main.temp.toFixed(1);
             dataWeather.weatherDescription = dataWeather.weather[0].description;
             dataWeather.windSpeed = dataWeather.wind.speed.toFixed(1);
-            dataWeather.windDeg = dataWeather.wind.deg.toFixed();
+            dataWeather.windDeg = dataWeather.wind.deg ? dataWeather.wind.deg.toFixed() : 0;
             dataWeather.windDescription = this._toTextualDescription(dataWeather.wind.deg);
             dataWeather.cloudsPercent = dataWeather.clouds.all;
             dataWeather.pressure = dataWeather.main.pressure;
             dataWeather.humidity = dataWeather.main.humidity;
-            dataWeather.rainDescription = !dataWeather.rain["3h"] ? 0 : dataWeather.rain["3h"];
+            dataWeather.rainDescription = !dataWeather.rain ? 0 : dataWeather.rain["3h"];
             dataWeather.sign = this._getSign(this._getWeatherType());
 
             dataWeather.cel = this._getWeatherType() === 'metric' ? 'metric' : null;
@@ -94,7 +111,9 @@ class WeatherWidget {
                 lastUpdate: lastUpdate
             });
         } else {
-            this._el.innerHTML = dataWeather.message;
+            this._el.innerHTML = errortpl({
+                message: dataWeather.message
+            });
         }
 
     }
@@ -129,6 +148,15 @@ class WeatherWidget {
             this._el.innerHTML = reloader();
             this._ready();
         }
+        if (e.target.getAttribute('name') === 'city-submit') {
+            let form = document.forms.changeCity;
+            if (form.elements.cityName.value.length < 3) {
+                form.elements.cityName.parentElement.classList.add('has-danger');
+                document.querySelector('.form-control-feedback').classList.remove('hidden');
+            }
+            this._setCity(form.elements.cityName.value);
+            this._ready(null, this._getCity());
+        }
     }
 
     _setWeatherType(type) {
@@ -143,6 +171,14 @@ class WeatherWidget {
 
     _getSign(type) {
         return type === 'metric' ? celsius : fahrenheit;
+    }
+
+    _setCity(city) {
+        sessionStorage.setItem('city', city);
+    }
+
+    _getCity() {
+        return sessionStorage.getItem('city');
     }
 
 }

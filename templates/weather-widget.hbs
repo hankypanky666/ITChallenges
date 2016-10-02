@@ -1,4 +1,15 @@
+
 <div class="card">
+    <div class="card-block">
+        <form class="form-inline" name="changeCity">
+            <div class="form-group">
+                <input type="text" class="form-control" name="cityName" placeholder="Enter city name">
+                <button type="button" name="city-submit" class="btn btn-outline-success">search</button>
+
+                <div class="form-control-feedback hidden">enter more than 3 characters</div>
+            </div>
+        </form>
+    </div>
     <div class="card-block">
         <h4 class="card-title">{{dataWeather.cityName}}, {{dataWeather.countryId}}
             <span class="pull-right">
@@ -36,10 +47,12 @@
                 <td>Humidity</td>
                 <td id="weather-widget-humidity">{{dataWeather.humidity }} %</td>
             </tr>
-            <tr id="weather-widget-row-rain">
-                <td>Rain</td>
-                <td id="weather-widget-rain">{{dataWeather.rainDescription}}</td>
-            </tr>
+            {{#if dataWeather.rainDescription}}
+                <tr id="weather-widget-row-rain">
+                    <td>Rain</td>
+                    <td id="weather-widget-rain">{{dataWeather.rainDescription}}</td>
+                </tr>
+            {{/if}}
             <tr>
                 <td>Sunrise</td>
                 <td id="weather-widget-sunrise">{{dataWeather.sunrise}}</td>
