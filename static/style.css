@@ -207,6 +207,31 @@ table {
     background-color: #5cb85c;
     border-color: #5cb85c;
 }
+.btn-outline-secondary {
+    color: #ccc;
+    background-image: none;
+    background-color: transparent;
+    border-color: #ccc;
+}
+
+.btn-outline-secondary:hover {
+    color: #fff;
+    background-color: #ccc;
+    border-color: #ccc;
+}
+
+.btn-outline-secondary:focus, .btn-outline-secondary.focus {
+    color: #fff;
+    background-color: #ccc;
+    border-color: #ccc;
+}
+
+.btn-outline-secondary:active, .btn-outline-secondary.active,
+.open > .btn-outline-secondary.dropdown-toggle {
+    color: #fff;
+    background-color: #ccc;
+    border-color: #ccc;
+}
 
 .form-control {
     display: block;

@@ -1,4 +1,6 @@
 // a957911186d6957a2a33a1ece83a6056
+"use strict";
+
 const url = 'http://api.openweathermap.org/data/2.5/weather?';
 const weatherUrlIcon = 'http://openweathermap.org/img/w/';
 
@@ -45,12 +47,8 @@ class WeatherWidget {
     }
 
     _ready(e, city) {
-        if (!city){
-            this.position.getUserPosition()
-                .then((position) => this._loadData(position))
-                .catch(function (error) {
-                    // uhoh, something went wrong
-                });
+        if (!city) {
+            this.position.getUserPosition().then((position) => this._loadData(position));
         } else {
             this._loadData(null, city);
         }
@@ -59,24 +57,14 @@ class WeatherWidget {
 
     // loading data from Weather
     _loadData(position, city) {
-        if (!city){
+        if (!city) {
             let lastUpdate = this._createDateTime(position.timestamp);
 
             this.http.httpGet(`${url}lat=${position.coords.latitude.toFixed(2)}&lon=${position.coords.longitude.toFixed(2)}&units=${this._getWeatherType()}&appid=${this._appId}`)
-                .then(
-                    response => {
-                        this._render(response, lastUpdate);
-                    },
-                    error => console.log(`Rejected: ${error}`)
-                );
+                .then((response) => this._render(response, lastUpdate));
         } else {
             this.http.httpGet(`${url}q=${city}&units=${this._getWeatherType()}&appid=${this._appId}`)
-                .then(
-                    response => {
-                        this._render(response, this._createDateTime(Date.now()));
-                    },
-                    error => console.log(`Rejected: ${error}`)
-                );
+                .then((response) => this._render(response, this._createDateTime(Date.now())));
         }
 
     }
@@ -143,29 +131,29 @@ class WeatherWidget {
             this._el.innerHTML = reloader();
             this._ready(e, this._getCity());
         }
-        if (e.target.getAttribute('name') === 'weatherType') {
+        else if (e.target.getAttribute('name') === 'weatherType') {
             this._setWeatherType(e.target.getAttribute('data-type'));
             this._el.innerHTML = reloader();
             this._ready(e, this._getCity());
         }
-        if (e.target.getAttribute('name') === 'city-submit') {
+        else if (e.target.hasAttribute('data-city-submit')) {
             let form = document.forms.changeCity;
             if (form.elements.cityName.value.length < 3) {
                 form.elements.cityName.parentElement.classList.add('has-danger');
                 document.querySelector('.form-control-feedback').classList.remove('hidden');
             }
             this._setCity(form.elements.cityName.value);
-            this._ready(null, this._getCity());
+            this._ready(e, this._getCity());
         }
-        if (e.target.getAttribute('name') === 'city-refresh') {
-            this._setCity(null);
+        else if (e.target.hasAttribute('data-city-refresh')) {
+            this._setCity(false);
             this._el.innerHTML = reloader();
             this._ready();
         }
     }
 
     _setWeatherType(type) {
-        if (type !== sessionStorage.getItem('sign')){
+        if (type !== sessionStorage.getItem('sign')) {
             sessionStorage.setItem('sign', type);
         }
     }
@@ -179,10 +167,11 @@ class WeatherWidget {
     }
 
     _setCity(city) {
-        if(!city) {
+        if (!city) {
             sessionStorage.removeItem('city');
+        } else {
+            sessionStorage.setItem('city', city);
         }
-        sessionStorage.setItem('city', city);
     }
 
     _getCity() {

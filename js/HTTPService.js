@@ -1,8 +1,6 @@
+"use strict";
+
 class HTTPService {
-
-    constructor() {
-
-    }
 
     httpGet(url) {
         console.log(url);
@@ -29,6 +27,7 @@ class HTTPService {
         });
 
     }
+
 }
 
 module.exports = HTTPService;
