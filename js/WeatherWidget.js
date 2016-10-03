@@ -3,6 +3,7 @@
 
 const url = 'http://api.openweathermap.org/data/2.5/weather?';
 const weatherUrlIcon = 'http://openweathermap.org/img/w/';
+const geoLocationIp = 'http://freegeoip.net/json/';
 
 const celsius = '&deg; C';
 const fahrenheit = '&deg; F';
@@ -36,8 +37,9 @@ class WeatherWidget {
         if (!navigator.geolocation) {
             this._el.innerHTML = '<p>Geolocation is not supported by your browser</p>';
             return;
+        } else {
+            this.position = new GeolocationWidget();
         }
-        this.position = new GeolocationWidget();
 
         this.http = new HTTPService();
 
@@ -48,7 +50,16 @@ class WeatherWidget {
 
     _ready(e, city) {
         if (!city) {
-            this.position.getUserPosition().then((position) => this._loadData(position));
+            this.position.getUserPosition().then((position) => {this._loadData(position)},
+                (decline) => {
+                    this.http.httpGet(geoLocationIp).then((result) => {
+                        let res = JSON.parse(result);
+                        let position = { coords: {}};
+                        position.coords.latitude = res.latitude;
+                        position.coords.longitude = res.longitude;
+                        this._loadData(position);
+                    })
+                });
         } else {
             this._loadData(null, city);
         }
@@ -90,8 +101,8 @@ class WeatherWidget {
             dataWeather.cel = this._getWeatherType() === 'metric' ? 'metric' : null;
             dataWeather.far = this._getWeatherType() === 'imperial' ? 'imperial' : null;
 
-            dataWeather.sunrise = this._createDateTime(dataWeather.sys.sunrise);
-            dataWeather.sunset = this._createDateTime(dataWeather.sys.sunset);
+            // dataWeather.sunrise = this._createDateTime(dataWeather.sys.sunrise);
+            // dataWeather.sunset = this._createDateTime(dataWeather.sys.sunset);
 
             // generate handlebars template
             this._el.innerHTML = template({
