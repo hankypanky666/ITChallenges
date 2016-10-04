@@ -63,7 +63,6 @@ table {
 .card {
     position: relative;
     display: block;
-    margin-bottom: 0.75rem;
     background-color: #fff;
     border-radius: 0.25rem;
     border: 1px solid rgba(0, 0, 0, 0.125);
@@ -260,4 +259,8 @@ table {
 
 .hidden {
     display: none;
+}
+
+a.created {
+    font-size: .8rem;
 }
