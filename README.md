@@ -1,3 +1,7 @@
+### INDEX
+    /app
+        -index.html
+
 ### INSTALLATION
 
     npm install
@@ -22,3 +26,16 @@
         };
         new WeatherWidget(options);
     </script>
+    
+### STRUCTURE
+
+    /app
+        -bundle.js // compiled with webpack 
+        -index.html
+    /code
+        /js
+            -GeolocationWidget.js // BOM
+            -HTTPService.js // for requests
+            -WeatherWidget.js // main widget
+        /static // styles
+        /templates // templates handlebars
