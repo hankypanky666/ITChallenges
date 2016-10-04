@@ -50,13 +50,17 @@ class WeatherWidget {
 
     _ready(e, city) {
         if (!city) {
-            this.position.getUserPosition().then((position) => {this._loadData(position)},
+            this.position.getUserPosition().then(
+                (position) => {
+                    this._loadData(position)
+                },
                 (decline) => {
                     this.http.httpGet(geoLocationIp).then((result) => {
                         let res = JSON.parse(result);
-                        let position = { coords: {}};
+                        let position = {coords: {}};
                         position.coords.latitude = res.latitude;
                         position.coords.longitude = res.longitude;
+                        position.timestamp = Date.now();
                         this._loadData(position);
                     })
                 });

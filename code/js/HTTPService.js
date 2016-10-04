@@ -3,7 +3,7 @@
 class HTTPService {
 
     httpGet(url) {
-        console.log(url);
+        //console.log(url);
         return new Promise(function (resolve, reject) {
 
             let xhr = new XMLHttpRequest();

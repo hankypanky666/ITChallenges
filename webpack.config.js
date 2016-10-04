@@ -1,9 +1,9 @@
 let webpack = require('webpack');
 
 module.exports = {
-    entry: "./js/WeatherWidget",
+    entry: "./code/js/WeatherWidget",
     output: {
-        filename: "bundle.js",
+        filename: "./app/bundle.js",
         library: "WeatherWidget"
     },
 
